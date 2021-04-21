@@ -2,7 +2,7 @@ import React from "react";
 import products from "../products";
 import { Row, Col } from "react-bootstrap";
 import Product from "../components/Product";
-const HomeSceen = () => {
+const HomeScreen = () => {
   return (
     <>
       <Row>
@@ -16,4 +16,4 @@ const HomeSceen = () => {
   );
 };
 
-export default HomeSceen;
+export default HomeScreen;
