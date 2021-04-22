@@ -9,7 +9,9 @@
     "start": "node shop-backend/server",
     "server": "nodemon shop-backend/server",
     "client": "npm start --prefix shop-frontend",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "data:import": "node shop-backend/seeder",
+    "data:destroy": "node shop-backend/seeder -d"
   },
   "repository": {
     "type": "git",
