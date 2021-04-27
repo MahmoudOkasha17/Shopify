@@ -16,8 +16,10 @@ const getProducts = asyncHandler(async (req, res) => {
         },
       }
     : {};
-
-  const count = await Product.countDocuments({ ...keyword });
+  //const product = await Product.findById("608608f0f7d4f1549cc2ac7c");
+  //const count = await Product.countDocuments({ ...keyword });
+  const count = await Product.countDocuments("air");
+  //const count = 0;
   const products = await Product.find({ ...keyword })
     .limit(pageSize)
     .skip(pageSize * (page - 1));
