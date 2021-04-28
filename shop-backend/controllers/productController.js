@@ -116,7 +116,7 @@ const createProductReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body;
 
   const product = await Product.findById(req.params.id);
-
+  console.log(product.reviews);
   if (product) {
     const alreadyReviewed = product.reviews.find(
       (r) => r.user.toString() === req.user._id.toString()
@@ -133,7 +133,7 @@ const createProductReview = asyncHandler(async (req, res) => {
       comment,
       user: req.user._id,
     };
-
+    console.log("here");
     product.reviews.push(review);
 
     product.numReviews = product.reviews.length;
