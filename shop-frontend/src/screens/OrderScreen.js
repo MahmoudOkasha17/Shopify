@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { PayPalButton } from "react-paypal-button-v2";
-import { Link } from "react-router-dom";
-import { Row, Col, ListGroup, Image, Card, Button } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import Message from "../components/Message";
-import Loader from "../components/Loader";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { PayPalButton } from 'react-paypal-button-v2';
+import { Link } from 'react-router-dom';
+import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import Message from '../components/Message';
+import Loader from '../components/Loader';
 import {
   getOrderDetails,
   payOrder,
   deliverOrder,
-} from "../actions/orderActions";
+} from '../actions/orderActions';
 import {
   ORDER_PAY_RESET,
   ORDER_DELIVER_RESET,
-} from "../constants/orderConstants";
+} from '../constants/orderConstants';
 
 const OrderScreen = ({ match, history }) => {
   const orderId = match.params.id;
@@ -35,6 +35,10 @@ const OrderScreen = ({ match, history }) => {
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
+  const userToken = localStorage.getItem('userInfo')
+    ? JSON.parse(localStorage.getItem('userInfo')).token
+    : null;
+
   if (!loading) {
     //   Calculate prices
     const addDecimals = (num) => {
@@ -48,13 +52,13 @@ const OrderScreen = ({ match, history }) => {
 
   useEffect(() => {
     if (!userInfo) {
-      history.push("/login");
+      history.push('/login');
     }
 
     const addPayPalScript = async () => {
-      const { data: clientId } = await axios.get("/api/config/paypal");
-      const script = document.createElement("script");
-      script.type = "text/javascript";
+      const { data: clientId } = await axios.get('/api/config/paypal');
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
       script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
       script.async = true;
       script.onload = () => {
@@ -85,37 +89,89 @@ const OrderScreen = ({ match, history }) => {
     dispatch(deliverOrder(order));
   };
 
+  const createOrder = async (data, actions) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userToken}`,
+        },
+      };
+      const { data } = await axios.get(
+        `/api/orders/paypal/${order._id}`,
+        config
+      );
+      //order id
+      // console.log(data);
+      return data;
+    } catch (e) {
+      console.log({ e });
+    }
+  };
+
+  const onApprove = async (data, actions) => {
+    console.log('payed?');
+
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        auth: {
+          user: 'AcNjIEGMFDk-9mB7eORIZZ_qmxxGgnOtouf_6TJ6Ed0iKibYgpaMBqLho8HAoLyZOGHZ4CfANnNpC71B',
+          pass: 'EPTq8Lty6CnY5PU1Q4cDPsMSTMWftFVDXenk3JRSbpCi6zsoaRicQ-ObshB1TfaGLynP-sI_bcN1Gy6d',
+        },
+
+        json: true,
+      };
+
+      // const { data } = await axios.get(
+      //   `https://api-m.sandbox.paypal.com/v2/checkout/orders/5JG0107516847151B`,
+      //   config
+      // );
+      //to approve
+      const { data } = await axios.get(
+        `https://www.sandbox.paypal.com/checkoutnow?token=5JG0107516847151B`,
+        config
+      );
+      //https://www.sandbox.paypal.com/checkoutnow?token=4VW45368HJ294683Y
+      console.log(data);
+    } catch (e) {
+      console.log({ e });
+    }
+  };
+
   return loading ? (
     <Loader />
   ) : error ? (
-    <Message variant="danger">{error}</Message>
+    <Message variant='danger'>{error}</Message>
   ) : (
     <>
       <h1>Order {order._id}</h1>
       <Row>
         <Col md={8}>
-          <ListGroup variant="flush">
+          <ListGroup variant='flush'>
             <ListGroup.Item>
               <h2>Shipping</h2>
               <p>
                 <strong>Name: </strong> {order.user.name}
               </p>
               <p>
-                <strong>Email: </strong>{" "}
+                <strong>Email: </strong>{' '}
                 <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
               </p>
               <p>
                 <strong>Address:</strong>
-                {order.shippingAddress.address}, {order.shippingAddress.city}{" "}
-                {order.shippingAddress.postalCode},{" "}
+                {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
+                {order.shippingAddress.postalCode},{' '}
                 {order.shippingAddress.country}
               </p>
               {order.isDelivered ? (
-                <Message variant="success">
+                <Message variant='success'>
                   Delivered on {order.deliveredAt}
                 </Message>
               ) : (
-                <Message variant="danger">Not Delivered</Message>
+                <Message variant='danger'>Not Delivered</Message>
               )}
             </ListGroup.Item>
 
@@ -126,9 +182,9 @@ const OrderScreen = ({ match, history }) => {
                 {order.paymentMethod}
               </p>
               {order.isPaid ? (
-                <Message variant="success">Paid on {order.paidAt}</Message>
+                <Message variant='success'>Paid on {order.paidAt}</Message>
               ) : (
-                <Message variant="danger">Not Paid</Message>
+                <Message variant='danger'>Not Paid</Message>
               )}
             </ListGroup.Item>
 
@@ -137,7 +193,7 @@ const OrderScreen = ({ match, history }) => {
               {order.orderItems.length === 0 ? (
                 <Message>Order is empty</Message>
               ) : (
-                <ListGroup variant="flush">
+                <ListGroup variant='flush'>
                   {order.orderItems.map((item, index) => (
                     <ListGroup.Item key={index}>
                       <Row>
@@ -167,7 +223,7 @@ const OrderScreen = ({ match, history }) => {
         </Col>
         <Col md={4}>
           <Card>
-            <ListGroup variant="flush">
+            <ListGroup variant='flush'>
               <ListGroup.Item>
                 <h2>Order Summary</h2>
               </ListGroup.Item>
@@ -202,8 +258,10 @@ const OrderScreen = ({ match, history }) => {
                     <Loader />
                   ) : (
                     <PayPalButton
-                      amount={order.totalPrice}
-                      onSuccess={successPaymentHandler}
+                      createOrder={(data, actions) =>
+                        createOrder(data, actions)
+                      }
+                      onApprove={(data, actions) => onApprove(data, actions)}
                     />
                   )}
                 </ListGroup.Item>
@@ -215,8 +273,8 @@ const OrderScreen = ({ match, history }) => {
                 !order.isDelivered && (
                   <ListGroup.Item>
                     <Button
-                      type="button"
-                      className="btn btn-block"
+                      type='button'
+                      className='btn btn-block'
                       onClick={deliverHandler}
                     >
                       Mark As Delivered
