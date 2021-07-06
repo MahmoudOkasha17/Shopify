@@ -1,2 +1,2 @@
 # Shopify
-an ecommerce website made with react & node.js
+An ecommerce website made with react & node.js
