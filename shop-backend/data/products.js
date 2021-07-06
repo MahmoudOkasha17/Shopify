@@ -15,7 +15,7 @@ const products = [
     name: "iPhone 12 Pro Max",
     image: "/images/phone.jpg",
     description:
-      "Introducing the iPhone 11 Pro. A transformative triple-camera system that adds tons of capability without complexity. An unprecedented leap in battery life",
+      "Apple's latest generation of smartphones, offering OLED display, 5G connectivity, the A14 chip for better performance, improved cameras, and MagSafe, all in a new, squared-off design",
     brand: "Apple",
     category: "Electronics",
     price: 999.99,
